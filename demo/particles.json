@@ -8,7 +8,12 @@
       }
     },
     "color": {
-      "value": "#ffffff"
+      "value": "#ffffff",
+      "gradient": {
+        "active": true,
+        "parameters": "(0, 0, 170, 0)",
+        "colorStop": ["(0, '#ffffff')", "(1, '#000000')" ]
+      }
     },
     "shape": {
       "type": "circle",
