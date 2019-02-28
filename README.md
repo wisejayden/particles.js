@@ -1,6 +1,8 @@
 ## particles.js
 
-### A lightweight JavaScript library for creating particles, now with gradient support.
+### A lightweight JavaScript library for creating particles.
+### The wisejayden edit: Added gradient support.
+
 
 ------------------------------
 ### `Demo / Generator`
