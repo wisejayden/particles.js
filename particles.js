@@ -13,7 +13,7 @@ var pJS = function(tag_id, params){
 
   /* particles.js variables with default values */
   this.pJS = {
-    
+
     canvas: {
       el: canvas_el,
       w: canvas_el.offsetWidth,
@@ -28,7 +28,12 @@ var pJS = function(tag_id, params){
         }
       },
       color: {
-        value: '#fff'
+        value: '#fff',
+        gradient: {
+          active: true,
+          parameters: [0, 0, 2000, 0],
+          colorStop: [[0, '#ffffff'], [1, '#000000']]
+        }
       },
       shape: {
         type: 'circle',
@@ -68,7 +73,7 @@ var pJS = function(tag_id, params){
       line_linked: {
         enable: true,
         distance: 100,
-        color: '#fff',
+        color: '#fff' ,
         opacity: 1,
         width: 1
       },
@@ -268,40 +273,48 @@ var pJS = function(tag_id, params){
 
     /* color */
     this.color = {};
-    if(typeof(color.value) == 'object'){
+    if (color.gradient.active === true) {
+      this.color.gradientActive = true;
+      this.color.parameters = color.gradient.parameters;
+      this.color.colorStop = color.gradient.colorStop;
+    } else {
+      this.color.gradientActive = false;
+      if(typeof(color.value) == 'object'){
 
-      if(color.value instanceof Array){
-        var color_selected = color.value[Math.floor(Math.random() * pJS.particles.color.value.length)];
-        this.color.rgb = hexToRgb(color_selected);
-      }else{
-        if(color.value.r != undefined && color.value.g != undefined && color.value.b != undefined){
-          this.color.rgb = {
-            r: color.value.r,
-            g: color.value.g,
-            b: color.value.b
+        if(color.value instanceof Array){
+          var color_selected = color.value[Math.floor(Math.random() * pJS.particles.color.value.length)];
+          this.color.rgb = hexToRgb(color_selected);
+        }else{
+          if(color.value.r != undefined && color.value.g != undefined && color.value.b != undefined){
+            this.color.rgb = {
+              r: color.value.r,
+              g: color.value.g,
+              b: color.value.b
+            }
+          }
+          if(color.value.h != undefined && color.value.s != undefined && color.value.l != undefined){
+            this.color.hsl = {
+              h: color.value.h,
+              s: color.value.s,
+              l: color.value.l
+            }
           }
         }
-        if(color.value.h != undefined && color.value.s != undefined && color.value.l != undefined){
-          this.color.hsl = {
-            h: color.value.h,
-            s: color.value.s,
-            l: color.value.l
-          }
+
+      }
+      else if(color.value == 'random'){
+        this.color.rgb = {
+          r: (Math.floor(Math.random() * (255 - 0 + 1)) + 0),
+          g: (Math.floor(Math.random() * (255 - 0 + 1)) + 0),
+          b: (Math.floor(Math.random() * (255 - 0 + 1)) + 0)
         }
       }
-
-    }
-    else if(color.value == 'random'){
-      this.color.rgb = {
-        r: (Math.floor(Math.random() * (255 - 0 + 1)) + 0),
-        g: (Math.floor(Math.random() * (255 - 0 + 1)) + 0),
-        b: (Math.floor(Math.random() * (255 - 0 + 1)) + 0)
+      else if(typeof(color.value) == 'string'){
+        this.color = color;
+        this.color.rgb = hexToRgb(this.color.value);
       }
     }
-    else if(typeof(color.value) == 'string'){
-      this.color = color;
-      this.color.rgb = hexToRgb(this.color.value);
-    }
+
 
     /* opacity */
     this.opacity = (pJS.particles.opacity.random ? Math.random() : 1) * pJS.particles.opacity.value;
@@ -414,12 +427,26 @@ var pJS = function(tag_id, params){
       var opacity = p.opacity;
     }
 
-    if(p.color.rgb){
-      var color_value = 'rgba('+p.color.rgb.r+','+p.color.rgb.g+','+p.color.rgb.b+','+opacity+')';
-    }else{
-      var color_value = 'hsla('+p.color.hsl.h+','+p.color.hsl.s+'%,'+p.color.hsl.l+'%,'+opacity+')';
+    var color_value;
+
+    if (p.color.gradientActive === true) {
+      color_value = pJS.canvas.ctx.createLinearGradient(...p.color.parameters);
+      for (var i = 0; i < p.color.colorStop.length; i++) {
+        color_value.addColorStop(...p.color.colorStop[i]);
+      }
+
+    } else {
+        if(p.color.rgb){
+          color_value = 'rgba('+p.color.rgb.r+','+p.color.rgb.g+','+p.color.rgb.b+','+opacity+')';
+        }else{
+          color_value = 'hsla('+p.color.hsl.h+','+p.color.hsl.s+'%,'+p.color.hsl.l+'%,'+opacity+')';
+        }
     }
 
+
+
+
+    //Is this it?
     pJS.canvas.ctx.fillStyle = color_value;
     pJS.canvas.ctx.beginPath();
 
